@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Spritz’s Lesson: Hydrophobic Sand</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap">
+<style>
+:root{--bg:#fff;--fg:#3c3c3c;--line:#e5e5e5;--mut:#777;--card:#f7f7f7;--g:#58cc02;--gd:#58a700;--b:#1cb0f6;--r:#ff4b4b;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#131f24;--fg:#fff;--line:#37464f;--mut:#afafaf;--card:#1f2c34;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#131f24;--fg:#fff;--line:#37464f;--mut:#afafaf;--card:#1f2c34;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+html,body{height:100%;margin:0}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:Nunito,"Trebuchet MS",system-ui,sans-serif;font-weight:800}
+.app{max-width:560px;height:100%;margin:0 auto;display:flex;flex-direction:column;padding:12px 16px 0}
+.top{display:flex;align-items:center;gap:12px}
+.x{background:none;border:0;color:var(--mut);font-size:1.6rem;cursor:pointer;font-family:inherit}
+.pb{flex:1;height:16px;background:var(--line);border-radius:9px;overflow:hidden}
+.pb i{display:block;height:100%;width:0;background:var(--g);border-radius:9px;transition:width .5s;position:relative}
+.pb i:after{content:"";position:absolute;left:8px;right:8px;top:3px;height:4px;background:rgba(255,255,255,.35);border-radius:4px}
+.xp{color:#ff9600;font-weight:900;white-space:nowrap}
+.main{flex:1;min-height:0;display:flex;flex-direction:column;gap:12px;padding:14px 0;overflow:auto}
+.view{flex:1;min-height:230px;border-radius:22px;background:linear-gradient(#9be1ff,#d7f3ff);position:relative;overflow:hidden}
+canvas{width:100%;height:100%;display:block}
+.tag{position:absolute;top:10px;left:12px;background:#fff;color:#3c3c3c;border-radius:12px;padding:4px 12px;font-size:.85rem;box-shadow:0 2px 0 #cfd8dc}
+.bub{position:relative;border:2px solid var(--line);border-radius:18px;padding:14px 16px;font-size:1.05rem;line-height:1.4}
+.bub h2{margin:0 0 4px;font-size:1.25rem}
+.bub p{margin:0;font-weight:700;color:var(--mut)}
+.bub:before{content:"";position:absolute;top:-9px;left:34px;width:14px;height:14px;background:var(--bg);border-left:2px solid var(--line);border-top:2px solid var(--line);transform:rotate(45deg)}
+.q h2{font-size:1.4rem;margin:6px 0 14px}
+.sandy{font-size:3rem;text-align:center}
+.opt{display:block;width:100%;text-align:left;font:inherit;font-size:1.05rem;color:var(--fg);background:var(--bg);border:2px solid var(--line);border-bottom-width:4px;border-radius:16px;padding:14px 16px;margin-bottom:10px;cursor:pointer}
+.opt.sel{border-color:var(--b);background:rgba(28,176,246,.14);color:var(--b)}
+.opt.ok{border-color:var(--g);background:rgba(88,204,2,.16);color:var(--g)}
+.opt.no{border-color:var(--r);background:rgba(255,75,75,.14);color:var(--r)}
+.foot{border-top:2px solid var(--line);margin:0 -16px;padding:14px 16px 16px;transition:background .2s}
+.foot.ok{background:rgba(88,204,2,.16);border-color:transparent}
+.foot.no{background:rgba(255,75,75,.14);border-color:transparent}
+.fb{font-size:1.2rem;margin-bottom:10px}
+.foot.ok .fb{color:var(--g)}.foot.no .fb{color:var(--r)}
+.btn{width:100%;font:inherit;font-size:1rem;letter-spacing:.06em;text-transform:uppercase;color:#fff;background:var(--g);border:0;border-radius:16px;padding:14px;box-shadow:0 4px 0 var(--gd);cursor:pointer}
+.btn:active{transform:translateY(4px);box-shadow:none}
+.btn:disabled{background:var(--line);color:var(--mut);box-shadow:0 4px 0 var(--line);cursor:default}
+.foot.no .btn{background:var(--r);box-shadow:0 4px 0 #ea2b2b}
+.done{text-align:center;margin:auto 0}
+.done h1{font-size:2rem;margin:8px 0}
+.stats{display:flex;gap:12px;justify-content:center;margin:18px 0}
+.stat{border:2px solid;border-radius:16px;padding:8px 18px;min-width:110px}
+.stat small{display:block;font-size:.75rem;text-transform:uppercase}
+.stat b{font-size:1.5rem}
+.cf{position:fixed;top:-20px;font-size:1.4rem;animation:cf 3s linear forwards;pointer-events:none}
+@keyframes cf{to{transform:translateY(110vh) rotate(540deg)}}
+.shake{animation:sh .35s}
+@keyframes sh{25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="top"><button class="x" id="x" aria-label="Restart">✕</button><div class="pb"><i id="pb"></i></div><div class="xp" id="xp">⚡ 0</div><div class="xp" id="st" style="color:#ff4b4b">🔥 0</div></div>
+  <div class="main" id="main"></div>
+  <div class="foot" id="foot"></div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(function(){
+var T=THREE;
+/* ---------- lesson data ---------- */
+var steps=[
+{t:"learn",s:0,h:"Meet the ingredients",p:"Silicone sealant, mineral spirits, a spray bottle and clean, dry sand. Mix about 1 part sealant to 4 parts spirits."},
+{t:"quiz",q:"What makes sand hydrophobic?",o:["Salt crystals","A thin silicone coating on each grain","Extra heat"],a:1,why:"The silicone film repels water."},
+{t:"learn",s:1,h:"Mix the spray",p:"Cut the sealant into pieces, add the spirits and stir until it’s a thin, runny liquid. Pour it into the spray bottle."},
+{t:"quiz",q:"Why add mineral spirits to the sealant?",o:["To thin it so it sprays and spreads evenly","To make it stickier","To change its colour"],a:0,why:"Thick sealant can’t be sprayed. The solvent thins it."},
+{t:"learn",s:2,h:"Spray the sand",p:"Work outdoors on a thin layer of sand. Spray, stir, then spray again until every grain is coated."},
+{t:"quiz",q:"Which setup is safest for spraying?",o:["Indoors, near a candle","Outdoors, with gloves and no flames","In a closed room"],a:1,why:"Mineral spirits are flammable and the fumes are harsh."},
+{t:"learn",s:3,h:"Dry it out",p:"The spirits evaporate and the silicone cures on each grain. Break up clumps and wait 24+ hours."},
+{t:"quiz",q:"What happens while the sand dries?",o:["The sand dissolves","The silicone turns to water","The spirits evaporate and the silicone cures"],a:2,why:"Only the solvent leaves. The silicone film stays."},
+{t:"learn",s:4,h:"The water test",p:"Water can’t wet silicone. Drops bead up on treated sand, while untreated sand soaks them up."},
+{t:"quiz",q:"What do drops do on hydrophobic sand?",o:["Soak straight in","Bead up on top","Turn into oil"],a:1,why:"The coating has low surface energy, so water clings to itself."}
+];
+var i=0,xp=0,streak=0,right=0,total=0,sel=-1,checked=false;
+var $=function(id){return document.getElementById(id)};
+var main=$("main"),foot=$("foot");
+
+/* ---------- sound ---------- */
+var AC;function beep(f,d,tp){try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();var o=AC.createOscillator(),g=AC.createGain();o.type=tp||"sine";o.frequency.value=f;g.gain.value=.08;o.connect(g);g.connect(AC.destination);o.start();g.gain.exponentialRampToValueAtTime(.0001,AC.currentTime+d);o.stop(AC.currentTime+d)}catch(e){}}
+
+/* ---------- three.js ---------- */
+var cv=document.createElement("canvas"),R=new T.WebGLRenderer({canvas:cv,antialias:true,alpha:true}),S=new T.Scene(),cam=new T.PerspectiveCamera(40,1,.1,100);
+S.add(new T.HemisphereLight(0xffffff,0xc9b690,.95));
+var dl=new T.DirectionalLight(0xffffff,.7);dl.position.set(4,8,6);S.add(dl);
+var G=new T.Group();S.add(G);
+function M(c,o){return new T.MeshStandardMaterial(Object.assign({color:c,roughness:.55},o||{}))}
+function mesh(g,c,o){return new T.Mesh(g,M(c,o))}
+function cyl(r,h,c,o){return mesh(new T.CylinderGeometry(r,r,h,28),c,o)}
+function sph(r,c,o){return mesh(new T.SphereGeometry(r,20,16),c,o)}
+var plat=cyl(4.8,.4,0xf3dfb0);plat.position.y=-.2;S.add(plat);
+function clr(){while(G.children.length)G.remove(G.children[0])}
+function put(m,x,y,z){m.position.set(x,y,z);G.add(m);m.userData.y=y;return m}
+function mascot(x,y,z,s){var g=new T.Group();g.add(cyl(.7,1.8,0xcfe9ff,{transparent:true,opacity:.6}));var lq=cyl(.6,1.2,0xf0b24a);lq.position.y=-.25;g.add(lq);var hd=cyl(.42,.5,0xe0892b);hd.position.y=1.15;g.add(hd);var nz=mesh(new T.BoxGeometry(.85,.26,.26),0xe0892b);nz.position.set(.5,1.3,0);g.add(nz);
+ [-1,1].forEach(function(k){var e=sph(.2,0xffffff);e.position.set(k*.28,.3,.64);g.add(e);var p=sph(.1,0x222222);p.position.set(k*.28,.3,.82);g.add(p);var c=sph(.13,0xff9aa8);c.position.set(k*.5,-.05,.58);c.scale.z=.4;g.add(c)});
+ var sm=mesh(new T.TorusGeometry(.28,.05,8,16,Math.PI),0x7a4a1a);sm.rotation.z=Math.PI;sm.position.set(0,-.02,.7);g.add(sm);
+ g.scale.setScalar(s||1);return put(g,x,y,z)}
+function bob(m,t,a){m.position.y=m.userData.y+Math.abs(Math.sin(t*3))*(a||.3);m.rotation.y=Math.sin(t*1.5)*.3}
+function dome(x,r,c){var m=mesh(new T.SphereGeometry(r,32,16,0,Math.PI*2,0,Math.PI/2),c);m.scale.y=.55;m.position.set(x,0,0);G.add(m);return m}
+function bottle(){var g=new T.Group();g.add(cyl(.6,1.4,0xcfe9ff,{transparent:true,opacity:.6}));var l=cyl(.5,.9,0xf0b24a);l.position.y=-.2;g.add(l);var h=cyl(.3,.4,0xe0892b);h.position.y=.9;g.add(h);var n=mesh(new T.BoxGeometry(.7,.2,.2),0xe0892b);n.position.set(.3,1.05,0);g.add(n);return g}
+function lerpC(m,a,b,k){m.material.color.setHex(a).lerp(new T.Color(b),k)}
+function sc0(){var it=[];
+ var tube=new T.Group();tube.add(cyl(.45,1.8,0xffffff));var nz=mesh(new T.ConeGeometry(.45,.7,24),0xdde4ea);nz.position.y=1.25;tube.add(nz);var bd=cyl(.47,.5,0xff6b6b);tube.add(bd);it.push(put(tube,-3,1.15,0));
+ var can=new T.Group();can.add(cyl(.75,1.5,0x1cb0f6));var lid=cyl(.5,.3,0x9aa6b6);lid.position.y=.9;can.add(lid);var bn=cyl(.77,.5,0xffffff);can.add(bn);it.push(put(can,-1.1,.85,0));
+ var bt=bottle();it.push(put(bt,.9,.85,0));
+ dome(2.7,1.1,0xe1bf7a);mascot(0,1.0,-1.8,1.1);var m=G.children[G.children.length-1];
+ return function(t){it.forEach(function(o,k){o.position.y=o.userData.y+Math.sin(t*2+k)*.18;o.rotation.y=t*.8});bob(m,t)}}
+function sc1(){var jar=mesh(new T.CylinderGeometry(1.3,1.3,2.4,32,1,true),0xcfe9ff,{transparent:true,opacity:.35,side:T.DoubleSide});put(jar,0,1.3,0);
+ var liq=cyl(1.2,1.8,0xf0b24a);liq.scale.y=.01;put(liq,0,.15,0);
+ var blob=sph(.28,0xffffff);blob.scale.y=1.3;G.add(blob);
+ var piv=new T.Group();piv.position.set(0,1.3,0);var rod=cyl(.08,2.8,0xe0892b);rod.position.x=.5;rod.rotation.z=.2;piv.add(rod);G.add(piv);
+ var m=mascot(3.2,1.0,0,1);
+ return function(t){var k=Math.min(1,t/2.5);liq.scale.y=Math.max(.01,k);liq.position.y=.15+.9*k;lerpC(liq,0xf0b24a,0xf6dba0,Math.min(1,t/6));
+  var u=(t%1.6)/1.6;blob.position.set(0,3.8-2.2*u*u,0);blob.visible=u<.95&&t<4.8;piv.rotation.y=t*4;bob(m,t)}}
+function sc2(){var m=mascot(-3.2,1.35,0,1.5);var p=dome(2.3,1.9,0xe1bf7a),ps=[];
+ for(var k=0;k<48;k++){var s=sph(.08,k%3?0xf0b24a:0xfff3c4);G.add(s);ps.push({s:s,ph:k/48,tx:2.3+(Math.random()-.5)*2.6,tz:(Math.random()-.5)*1.8})}
+ return function(t){var sq=Math.sin(t*9)*.05;m.scale.set(1.5-sq,1.5+sq,1.5-sq);ps.forEach(function(q){var u=(t*.9+q.ph)%1,x=-1.8+(q.tx+1.8)*u,y=3.3+(1.2-3.3)*u+Math.sin(u*Math.PI)*.5;q.s.position.set(x,y,q.tz*u)});
+  lerpC(p,0xe1bf7a,0x8a6a3c,Math.min(1,t/6));m.rotation.y=Math.sin(t*1.5)*.15}}
+function sc3(){var p=dome(0,2,0x8a6a3c),vs=[];
+ for(var k=0;k<16;k++){var s=sph(.14,0xffffff,{transparent:true,opacity:.7});G.add(s);vs.push({s:s,ph:k/16,x:(Math.random()-.5)*2.4,z:(Math.random()-.5)*1.6})}
+ var sun=new T.Group();sun.add(sph(.6,0xffd23f));for(var k=0;k<8;k++){var r=mesh(new T.BoxGeometry(.15,.5,.15),0xffd23f);r.position.set(Math.cos(k*Math.PI/4)*1,Math.sin(k*Math.PI/4)*1,0);r.rotation.z=k*Math.PI/4-Math.PI/2;sun.add(r)}put(sun,3,4,-1);
+ var m=mascot(-3,1,0,1);
+ return function(t){vs.forEach(function(q){var u=(t*.35+q.ph)%1;q.s.position.set(q.x+Math.sin(u*6)*.2,1+u*3.2,q.z);q.s.material.opacity=.7*(1-u);q.s.scale.setScalar(.6+u)});sun.rotation.z=t*.8;bob(m,t)}}
+function sc4(){var a=dome(-2.6,1.7,0xe1bf7a),b=dome(2.6,1.7,0x8a6a3c),top=1.7*.55,ds=[];
+ [[-2.6,0],[-2.6,1.6],[2.6,0],[2.6,1.3],[2.6,2.6]].forEach(function(d,k){var s=sph(.22,0x4aa8ff,{transparent:true,opacity:.9});G.add(s);ds.push({s:s,x:d[0]+(k%3-1)*.35,off:d[1],hy:d[0]>0})});
+ var m=mascot(0,1.2,-2.2,1);
+ return function(t){ds.forEach(function(d){var ph=(t+d.off)%4,s=d.s,x=d.x;s.visible=true;s.material.opacity=.9;
+   if(ph<1){s.position.set(x,top+.22+(1-ph*ph)*4,0);s.scale.set(1,1,1)}
+   else if(!d.hy){var k=ph-1;s.visible=k<1;s.position.set(x,top+.15-k*.2,0);s.scale.set(1+k,Math.max(.05,1-k),1+k);s.material.opacity=.9*(1-k)}
+   else if(ph<1.9){var k=(ph-1)/.9;s.position.set(x,top+.22+Math.sin(k*Math.PI)*1.1*(1-k*.5),0);s.scale.set(1,1,1)}
+   else{var k=Math.min(1,(ph-1.9)/.3);s.position.set(x,top+.2,0);s.scale.set(1.15,.9,1.15);if(ph>3.7)s.scale.multiplyScalar(Math.max(.01,(4-ph)/.3))}});
+  m.position.y=m.userData.y+Math.abs(Math.sin(t*5))*.5;m.rotation.y=Math.sin(t*2)*.4}}
+var scs=[sc0,sc1,sc2,sc3,sc4],upd=null,t0=0,prev=0,live=false;
+function loadScene(n){clr();upd=scs[n]();t0=0;prev=performance.now()}
+function size(){var v=cv.parentNode;if(!v)return;var w=v.clientWidth,h=v.clientHeight;if(!w||!h)return;R.setPixelRatio(Math.min(window.devicePixelRatio||1,2));R.setSize(w,h,false);cam.aspect=w/h;cam.position.set(0,3.8,10*Math.max(1,1.45/cam.aspect));cam.lookAt(0,1.1,0);cam.updateProjectionMatrix()}
+function loop(n){requestAnimationFrame(loop);if(!live||!upd)return;t0+=(n-prev)/1000;prev=n;upd(t0);R.render(S,cam)}
+requestAnimationFrame(loop);
+window.addEventListener("resize",size);
+
+/* ---------- UI ---------- */
+function bar(){$("pb").style.width=(i/steps.length*100)+"%";$("xp").textContent="⚡ "+xp;$("st").textContent="🔥 "+streak}
+var names=["Ingredients","Mixing","Spray time!","Drying","Water test"];
+function render(){bar();var s=steps[i];sel=-1;checked=false;foot.className="foot";
+ if(i>=steps.length)return done();
+ if(s.t==="learn"){live=true;main.innerHTML='<div class="view"><span class="tag">Step '+(s.s+1)+' · '+names[s.s]+'</span></div><div class="bub"><h2>'+s.h+'</h2><p>'+s.p+'</p></div>';
+  main.firstChild.appendChild(cv);size();loadScene(s.s);
+  foot.innerHTML='<button class="btn" id="go">Continue</button>';$("go").onclick=function(){beep(520,.12);i++;render()}}
+ else{live=false;main.innerHTML='<div class="sandy">🧴</div><div class="q"><h2>'+s.q+'</h2><div id="os"></div></div>';
+  s.o.forEach(function(o,k){var b=document.createElement("button");b.className="opt";b.textContent=o;b.onclick=function(){if(checked)return;sel=k;[].forEach.call($("os").children,function(c,j){c.classList.toggle("sel",j===k)});$("chk").disabled=false;beep(440,.06)};$("os").appendChild(b)});
+  foot.innerHTML='<button class="btn" id="chk" disabled>Check</button>';$("chk").onclick=check}}
+function check(){var s=steps[i],ok=sel===s.a;checked=true;total++;var os=$("os").children;
+ os[s.a].className="opt ok";if(!ok){os[sel].className="opt no";os[sel].classList.add("shake")}
+ if(ok){xp+=10;streak++;right++;beep(660,.15);setTimeout(function(){beep(880,.2)},120)}else{streak=0;beep(180,.3,"sawtooth")}
+ bar();foot.className="foot "+(ok?"ok":"no");
+ foot.innerHTML='<div class="fb">'+(ok?"✅ Nice! +10 XP":"❌ Not quite")+'<div style="font-size:.95rem;font-weight:700">'+s.why+'</div></div><button class="btn" id="nx">Continue</button>';
+ $("nx").onclick=function(){i++;render()}}
+function done(){live=false;foot.className="foot";foot.innerHTML='<button class="btn" id="again">Practice again</button>';
+ var acc=total?Math.round(right/total*100):0;
+ main.innerHTML='<div class="done"><div style="font-size:4.5rem">🏆</div><h1>Lesson complete!</h1><div style="color:var(--mut)">You can now make hydrophobic sand.</div><div class="stats"><div class="stat" style="border-color:#ff9600;color:#ff9600"><small>Total XP</small><b>'+xp+'</b></div><div class="stat" style="border-color:var(--g);color:var(--g)"><small>Accuracy</small><b>'+acc+'%</b></div></div></div>';
+ $("again").onclick=function(){i=0;xp=0;streak=0;right=0;total=0;render()};
+ beep(523,.2);setTimeout(function(){beep(659,.2)},150);setTimeout(function(){beep(784,.35)},300);
+ var e=["🎉","💧","⭐","🏖️","✨"];for(var k=0;k<36;k++){var d=document.createElement("div");d.className="cf";d.textContent=e[k%5];d.style.left=Math.random()*100+"vw";d.style.animationDelay=Math.random()*1.2+"s";document.body.appendChild(d);setTimeout(function(n){return function(){n.remove()}}(d),5000)}}
+$("x").onclick=function(){i=0;xp=0;streak=0;right=0;total=0;render()};
+render();
+})();
+</script>
+</body>
+</html>
